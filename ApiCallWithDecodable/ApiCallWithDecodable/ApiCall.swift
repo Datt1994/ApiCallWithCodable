@@ -13,16 +13,16 @@ class ApiCall: NSObject {
     let constValueField = "application/json"
     let constHeaderField = "Content-Type"
     
-    func post<T : Decodable ,A>(apiUrl : String, requestPARAMS: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
-        requestMethod(apiUrl: apiUrl, params: requestPARAMS as [String : AnyObject], method: "POST", model: model, completion: completion)
+    func post<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+        requestMethod(apiUrl: apiUrl, params: params as [String : AnyObject], method: "POST", model: model, completion: completion)
     }
     
     func get<T : Decodable>(apiUrl : String, model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
         requestGetMethod(apiUrl: apiUrl, method: "GET", model: model, completion: completion)
     }
     
-    func put<T : Decodable ,A>(apiUrl : String, requestPARAMS: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
-        requestMethod(apiUrl:apiUrl, params: requestPARAMS as [String : AnyObject], method: "PUT",model: model,  completion: completion)
+    func put<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+        requestMethod(apiUrl:apiUrl, params: params as [String : AnyObject], method: "PUT",model: model,  completion: completion)
     }
     
     func requestMethod<T : Decodable>(apiUrl : String, params: [String: AnyObject], isToken: Bool = true, method: NSString, model: T.Type  , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
