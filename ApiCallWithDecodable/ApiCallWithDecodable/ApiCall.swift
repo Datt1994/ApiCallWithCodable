@@ -86,7 +86,6 @@ class ApiCall: NSObject {
         let session = URLSession(configuration: URLSessionConfiguration.default)
         let task: URLSessionDataTask = session.dataTask(with : request as URLRequest, completionHandler: { (data, response, error) -> Void in
             
-            
             guard let data = data, error == nil else {
                 completion(false, nil)
                 return
@@ -102,7 +101,6 @@ class ApiCall: NSObject {
                 }
             } catch let error as NSError {
                 print(error.localizedDescription)
-                
                 do {
                     let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
                     
@@ -117,7 +115,6 @@ class ApiCall: NSObject {
         })
         task.resume()
     }
-    
 }
 func mainThread(_ completion: @escaping () -> ()) {
     DispatchQueue.main.async {
@@ -125,8 +122,6 @@ func mainThread(_ completion: @escaping () -> ()) {
     }
 }
 class GenralResponseModel : Decodable {
-    
     var message : String?
     var status : String?
-    
 }

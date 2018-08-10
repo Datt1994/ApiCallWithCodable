@@ -20,7 +20,7 @@ class ViewController: UIViewController {
         params ["email_id"] = "datt@gmail.com"
         params ["password"] = "123456"
         
-        ApiCall().post(apiUrl: "http://198.XX.XX.XX:XXXX/api/login", params: params, model: LoginModel.self) {
+        ApiCall().post(apiUrl: "http://198.XX.XX.XX:XXXX/login", params: params, model: LoginModel.self) {
             (success, responseData) in
             if (success) {
                 if let responseData = responseData as? LoginModel {
