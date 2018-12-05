@@ -54,21 +54,25 @@ class ApiCall: NSObject {
                 if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     print(convertedJsonIntoDict)
                 }
-                let dictResponse = try decoder.decode(model, from: data)
-                mainThread {
-                    completion(true,dictResponse as AnyObject)
-                }
-            } catch let error as NSError {
-                print(error.localizedDescription)
                 
-                do {
-                    let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
-                    
+                let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
+                
+                let strStatus = dictResponse.status ?? "failure"
+                if strStatus == "success" {
+                    let dictResponsee = try decoder.decode(model, from: data )
+                    mainThread {
+                        completion(true,dictResponsee as AnyObject)
+                    }
+                }
+                else{
                     mainThread {
                         completion(false, dictResponse.message as AnyObject)
                         debugPrint(dictResponse.message ?? 0)
                     }
-                } catch let error as NSError {
+                }
+            } catch let error as NSError {
+                debugPrint(error.localizedDescription)
+                mainThread {
                     completion(false, error as AnyObject)
                 }
             }
@@ -95,20 +99,25 @@ class ApiCall: NSObject {
                 if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
                     print(convertedJsonIntoDict)
                 }
-                let dictResponse = try decoder.decode(model, from: data )
-                mainThread {
-                    completion(true,dictResponse as AnyObject)
+                
+                let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
+                
+                let strStatus = dictResponse.status ?? "failure"
+                if strStatus == "success" {
+                    let dictResponsee = try decoder.decode(model, from: data )
+                    mainThread {
+                        completion(true,dictResponsee as AnyObject)
+                    }
                 }
-            } catch let error as NSError {
-                print(error.localizedDescription)
-                do {
-                    let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
-                    
+                else{
                     mainThread {
                         completion(false, dictResponse.message as AnyObject)
                         debugPrint(dictResponse.message ?? 0)
                     }
-                } catch let error as NSError {
+                }
+            } catch let error as NSError {
+                debugPrint(error.localizedDescription)
+                mainThread {
                     completion(false, error as AnyObject)
                 }
             }
