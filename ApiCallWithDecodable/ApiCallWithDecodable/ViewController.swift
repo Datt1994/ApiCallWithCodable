@@ -19,13 +19,16 @@ class ViewController: UIViewController {
         var params = [String : Any]()
         params ["email_id"] = "datt@gmail.com"
         params ["password"] = "123456"
-        
+
         ApiCall().post(apiUrl: "http://198.XX.XX.XX:XXXX/login", params: params, model: LoginModel.self) {
-            (success, responseData) in
-            if (success) {
-                if let responseData = responseData as? LoginModel {
-                    print(responseData)
-                }
+            result in
+            switch result {
+            case .success(let response):
+                print(response)
+            case .failure(let failureResponse):
+                print(failureResponse.message ?? "")
+            case .error(let e):
+                print(e ?? "")
             }
         }
     }
@@ -40,7 +43,7 @@ class ViewController: UIViewController {
 struct LoginModel: Decodable {
     var data : LoginData?
     var message : String?
-    var status : String?
+    var status : Int?
 }
 struct LoginData: Decodable {
     

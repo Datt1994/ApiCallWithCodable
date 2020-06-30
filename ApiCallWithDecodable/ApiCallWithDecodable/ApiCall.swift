@@ -8,27 +8,33 @@
 
 import UIKit
 
+enum ApiCallResult<Value,ResponseError : GenralResponseModel> {
+    case success(Value)
+    case failure(ResponseError)
+    case error(Error?)
+}
+
 class ApiCall: NSObject {
     
     let constValueField = "application/json"
     let constHeaderField = "Content-Type"
     
-    func post<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+    func post<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GenralResponseModel>) -> ()) {
         requestMethod(apiUrl: apiUrl, params: params as [String : AnyObject], method: "POST", model: model, completion: completion)
     }
     
-    func get<T : Decodable>(apiUrl : String, model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
-        requestGetMethod(apiUrl: apiUrl, method: "GET", model: model, completion: completion)
+    func get<T : Decodable>(apiUrl : String, model: T.Type , completion: @escaping (ApiCallResult<T,GenralResponseModel>) -> ()) {
+        requestMethod(apiUrl:apiUrl, params: [:], method: "GET",model: model,  completion: completion)
     }
     
-    func put<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+    func put<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GenralResponseModel>) -> ()) {
         requestMethod(apiUrl:apiUrl, params: params as [String : AnyObject], method: "PUT",model: model,  completion: completion)
     }
     
-    func requestMethod<T : Decodable>(apiUrl : String, params: [String: AnyObject], isToken: Bool = true, method: NSString, model: T.Type  , completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
+    func requestMethod<T : Decodable>(apiUrl : String, params: [String: AnyObject], isToken: Bool = true, method: String, model: T.Type  , completion: @escaping (ApiCallResult<T,GenralResponseModel>) -> ()) {
         
         var request = URLRequest(url: URL(string: apiUrl)!)
-        request.httpMethod = method as String
+        request.httpMethod = method
         request.setValue(constValueField, forHTTPHeaderField: constHeaderField)
         
         
@@ -44,8 +50,7 @@ class ApiCall: NSObject {
         let session = URLSession(configuration: URLSessionConfiguration.default)
         let task: URLSessionDataTask = session.dataTask(with : request as URLRequest, completionHandler: { (data, response, error) -> Void in
             guard let data = data, error == nil else {
-                // check for fundamental networking error
-                print("error=\(String(describing: error))")
+                if error != nil { completion(.error(error)) } else { completion(.error(nil)) }
                 return
             }
             
@@ -57,74 +62,31 @@ class ApiCall: NSObject {
                 
                 let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
                 
-                let strStatus = dictResponse.status ?? "failure"
-                if strStatus == "success" {
+                let strStatus = dictResponse.status ?? 0
+                if strStatus == 200 {
                     let dictResponsee = try decoder.decode(model, from: data )
                     mainThread {
-                        completion(true,dictResponsee as AnyObject)
+                        completion(.success(dictResponsee))
                     }
                 }
                 else{
                     mainThread {
-                        completion(false, dictResponse.message as AnyObject)
+                        completion(.failure(dictResponse))
                         debugPrint(dictResponse.message ?? 0)
                     }
                 }
             } catch let error as NSError {
                 debugPrint(error.localizedDescription)
                 mainThread {
-                    completion(false, error as AnyObject)
+                    completion(.error(error))
                 }
             }
         })
         task.resume()
     }
     
-    func requestGetMethod<T : Decodable>(apiUrl : String, method: String, isToken: Bool = true, model: T.Type, completion: @escaping (_ success: Bool, _ object: AnyObject?) -> ()) {
-        
-        var request = URLRequest(url: URL(string: apiUrl)!)
-        
-        request.httpMethod = method
-        //  request.addValue(constValueField, forHTTPHeaderField: constHeaderField)
-        
-        let session = URLSession(configuration: URLSessionConfiguration.default)
-        let task: URLSessionDataTask = session.dataTask(with : request as URLRequest, completionHandler: { (data, response, error) -> Void in
-            
-            guard let data = data, error == nil else {
-                completion(false, nil)
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                if let convertedJsonIntoDict = try JSONSerialization.jsonObject(with: data, options: []) as? NSDictionary {
-                    print(convertedJsonIntoDict)
-                }
-                
-                let dictResponse = try decoder.decode(GenralResponseModel.self, from: data )
-                
-                let strStatus = dictResponse.status ?? "failure"
-                if strStatus == "success" {
-                    let dictResponsee = try decoder.decode(model, from: data )
-                    mainThread {
-                        completion(true,dictResponsee as AnyObject)
-                    }
-                }
-                else{
-                    mainThread {
-                        completion(false, dictResponse.message as AnyObject)
-                        debugPrint(dictResponse.message ?? 0)
-                    }
-                }
-            } catch let error as NSError {
-                debugPrint(error.localizedDescription)
-                mainThread {
-                    completion(false, error as AnyObject)
-                }
-            }
-        })
-        task.resume()
-    }
 }
+
 func mainThread(_ completion: @escaping () -> ()) {
     DispatchQueue.main.async {
         completion()
@@ -132,5 +94,5 @@ func mainThread(_ completion: @escaping () -> ()) {
 }
 class GenralResponseModel : Decodable {
     var message : String?
-    var status : String?
+    var status : Int?
 }
