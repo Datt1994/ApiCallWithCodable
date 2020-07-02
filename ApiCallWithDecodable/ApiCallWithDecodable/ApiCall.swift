@@ -8,30 +8,30 @@
 
 import UIKit
 
-enum ApiCallResult<Value,ResponseError : GeneralResponseModel> {
+public enum ApiCallResult<Value,ResponseError : GeneralResponseModel> {
     case success(Value)
     case failure(ResponseError)
     case error(Error?)
 }
 
-class ApiCall: NSObject {
+public class ApiCall: NSObject {
     
     let constValueField = "application/json"
     let constHeaderField = "Content-Type"
     
-    func post<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
+    public func post<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
         requestMethod(apiUrl: apiUrl, params: params as [String : AnyObject], method: "POST", model: model, completion: completion)
     }
     
-    func get<T : Decodable>(apiUrl : String, model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
+    public func get<T : Decodable>(apiUrl : String, model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
         requestMethod(apiUrl:apiUrl, params: [:], method: "GET",model: model,  completion: completion)
     }
     
-    func put<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
+    public func put<T : Decodable ,A>(apiUrl : String, params: [String: A], model: T.Type , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
         requestMethod(apiUrl:apiUrl, params: params as [String : AnyObject], method: "PUT",model: model,  completion: completion)
     }
     
-    func requestMethod<T : Decodable>(apiUrl : String, params: [String: AnyObject], isToken: Bool = true, method: String, model: T.Type  , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
+    public func requestMethod<T : Decodable>(apiUrl : String, params: [String: AnyObject], isToken: Bool = true, method: String, model: T.Type  , completion: @escaping (ApiCallResult<T,GeneralResponseModel>) -> ()) {
         
         var request = URLRequest(url: URL(string: apiUrl)!)
         request.httpMethod = method
@@ -87,12 +87,12 @@ class ApiCall: NSObject {
     
 }
 
-func mainThread(_ completion: @escaping () -> ()) {
+fileprivate func mainThread(_ completion: @escaping () -> ()) {
     DispatchQueue.main.async {
         completion()
     }
 }
-class GeneralResponseModel : Decodable {
+public class GeneralResponseModel : Decodable {
     var message : String?
     var status : Int?
 }

@@ -1,8 +1,14 @@
 # ApiCallWithCodable
+[![Language: Swift 5](https://img.shields.io/badge/language-swift5-f48041.svg?style=flat)](https://developer.apple.com/swift)
+[![License](https://img.shields.io/cocoapods/l/DPOTPView.svg?style=flat)](https://github.com/Datt1994/ApiCallWithCodable/blob/master/LICENSE)
 
-**Step 1**:-  Copy & paste `ApiCall.swift` file into your project 
 
-**Step 2**:-  Usage 
+## Add Manually 
+
+Download Project and copy-paste `ApiCall.swift` file into your project 
+
+
+## How to use
 ```swift
         var params = [String : Any]()
         params ["email_id"] = "datt@gmail.com"
