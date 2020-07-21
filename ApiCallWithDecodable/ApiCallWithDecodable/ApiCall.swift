@@ -37,14 +37,15 @@ public class ApiCall: NSObject {
         request.httpMethod = method
         request.setValue(constValueField, forHTTPHeaderField: constHeaderField)
         
-        
-        let jsonTodo: NSData
-        do {
-            jsonTodo = try JSONSerialization.data(withJSONObject: params, options: []) as NSData
-            request.httpBody = jsonTodo as Data
-        } catch {
-            print("Error: cannot create JSON from todo")
-            return
+        if !params.isEmpty {
+            let jsonTodo: NSData
+            do {
+                jsonTodo = try JSONSerialization.data(withJSONObject: params, options: []) as NSData
+                request.httpBody = jsonTodo as Data
+            } catch {
+                print("Error: cannot create JSON from todo")
+                return
+            }
         }
         
         let session = URLSession(configuration: URLSessionConfiguration.default)
